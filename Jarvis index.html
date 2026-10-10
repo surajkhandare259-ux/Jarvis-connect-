@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+< lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS Connect</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #07111f;
+      color: #eef6ff;
+      text-align: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #111f32;
+      border: 1px solid #254766;
+      border-radius: 20px;
+    }
+    h1 { color: #55d6ff; }
+    p { line-height: 1.6; color: #c5d5e8; }
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .primary { background: #55d6ff; color: #07111f; }
+    .stop { background: #40212a; color: #ffb8c1; }
+    label { display: block; text-align: left; margin: 14px 0; }
+    #status { margin-top: 18px; color: #7cf5bd; }
+  </style>
+</head>
+<>
+  <div class="card">
+    <h1>J.A.R.V.I.S.</h1>
+    <p>JARVIS CONNECT</p>
+    <p>Connect securely, with clear permission and control.</p>
+
+    <label><input type="checkbox" id="device"> Device status sharing</label>
+    <label><input type="checkbox" id="location"> Location sharing</label>
+    <label><input type="checkbox" id="screen"> Screen sharing session</label>
+    <label><input type="checkbox" id="chat"> Share selected messages</label>
+
+    <label>
+      <input type="checkbox" id="consent">
+      I understand what I choose to share.
+    </label>
+
+    <button class="primary" onclick="connect()">Agree & Connect</button>
+    <button class="stop" onclick="stopSharing()">Stop All Sharing</button>
+
+    <p id="status">Status: Not connected</p>
+  </div>
+
+  <script>
+    function connect() {
+      const consent = document.getElementById("consent").checked;
+      if (!consent) {
+        document.getElementById("status").textContent =
+          "Please confirm consent first.";
+        return;
+      }
+      document.getElementById("status").textContent =
+        "Demo connected. No device data is being transmitted.";
+    }
+
+    function stopSharing() {
+      ["device", "location", "screen", "chat", "consent"].forEach(id => {
+        document.getElementById(id).checked = false;
+      });
+      document.getElementById("status").textContent =
