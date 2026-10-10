@@ -1,239 +1,122 @@
-
 <!DOCTYPE html>
-<html lang="en">
+< lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07111f">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JARVIS Connect</title>
-
   <style>
-    * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 24px 16px;
-      min-height: 100vh;
       font-family: Arial, sans-serif;
+      background: #07111f;
       color: #eef6ff;
-      background: radial-gradient(circle at top, #153453, #07111f 65%);
+      text-align: center;
+      padding: 24px;
     }
     .card {
-      max-width: 460px;
-      margin: 24px auto;
-      padding: 25px;
-      background: #101f32;
-      border: 1px solid #31516f;
-      border-radius: 22px;
-      box-shadow: 0 15px 45px #0005;
+      max-width: 420px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #111f32;
+      border: 1px solid #254766;
+      border-radius: 20px;
     }
-    .logo {
-      font-size: 34px;
-      font-weight: 800;
-      color: #55d6ff;
-      text-align: center;
-      letter-spacing: 3px;
-    }
-    h2 { text-align: center; font-size: 17px; }
-    p { color: #c5d5e8; line-height: 1.6; }
-    .intro { text-align: center; }
-    .notice {
-      padding: 12px;
-      border-radius: 12px;
-      background: #182e43;
-      font-size: 14px;
-    }
-    .option {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #29445e;
-      border-radius: 12px;
-      text-align: left;
-    }
-    .option input { margin-top: 4px; }
+    h1 { color: #55d6ff; }
+    p { line-height: 1.6; color: #c5d5e8; }
     button {
       width: 100%;
       padding: 14px;
       margin-top: 12px;
       border: 0;
-      border-radius: 11px;
-      font-size: 15px;
+      border-radius: 10px;
+      font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
     }
     .primary { background: #55d6ff; color: #07111f; }
-    .secondary { background: #213a53; color: white; }
     .stop { background: #40212a; color: #ffb8c1; }
-    #status {
-      overflow-wrap: anywhere;
-      text-align: center;
-      color: #7cf5bd;
-    }
-    .small { font-size: 12px; color: #9fb4c9; }
+    label { display: block; text-align: left; margin: 14px 0; }
+    #status { margin-top: 18px; color: #7cf5bd; }
   </style>
 </head>
+<>
+  <div class="card">
+    <h1>J.A.R.V.I.S.</h1>
+    <p>JARVIS CONNECT</p>
+    <p>Connect securely, with clear permission and control.</p>
 
-<body>
-  <main class="card">
-    <div class="logo">J.A.R.V.I.S.</div>
-    <h2>JARVIS CONNECT</h2>
-    <p class="intro">
-      Secure connection with your knowledge, permission and control.
-    </p>
+    <label><input type="checkbox" id="device"> Device status sharing</label>
+    <label><input type="checkbox" id="location"> Location sharing</label>
+    <label><input type="checkbox" id="screen"> Screen sharing session</label>
+    <label><input type="checkbox" id="chat"> Share selected messages</label>
 
-    <div class="notice">
-      <strong>Your choice matters.</strong>
-      Nothing is shared by this demo. Sign-in identifies your Google
-      account only after you choose to sign in.
-    </div>
-
-    <button class="primary" id="googleBtn">
-      Continue with Google
-    </button>
-
-    <p id="account">Not signed in.</p>
-
-    <h2>Choose what you consent to</h2>
-
-    <label class="option">
-      <input type="checkbox" id="device">
-      <span><strong>Device status</strong><br>
-      Allow sharing basic status in a future supported session.</span>
-    </label>
-
-    <label class="option">
-      <input type="checkbox" id="location">
-      <span><strong>Location</strong><br>
-      Location would require a separate browser permission.</span>
-    </label>
-
-    <label class="option">
-      <input type="checkbox" id="screen">
-      <span><strong>Screen sharing</strong><br>
-      Screen sharing requires a separate, active browser session.</span>
-    </label>
-
-    <label class="option">
-      <input type="checkbox" id="chat">
-      <span><strong>Selected messages</strong><br>
-      No messages are accessed or sent by this demo.</span>
-    </label>
-
-    <label class="option">
+    <label>
       <input type="checkbox" id="consent">
-      <span>I understand the options above and voluntarily agree to
-      continue with the demo.</span>
+      I understand what I choose to share.
     </label>
 
-    <button class="primary" id="agreeBtn">Agree &amp; Connect</button>
-    <button class="stop" id="stopBtn">Stop / Withdraw Consent</button>
+    <button class="primary" onclick="connect()">Agree & Connect</button>
+    <button class="stop" onclick="stopSharing()">Stop All Sharing</button>
 
     <p id="status">Status: Not connected</p>
-    <p class="small">
-      Demo only. No location, messages, screen contents or other device
-      data are transmitted. You can stop at any time.
-    </p>
-  </main>
+  </div>
 
-  <script type="module">
-    import { initializeApp } from
-      "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
-    import {
-      getAuth,
-      GoogleAuthProvider,
-      signInWithPopup,
-      onAuthStateChanged,
-      signOut
-    } from
-      "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-
-    // Replace these placeholder values with your own Firebase web config.
-    const firebaseConfig = {
-      apiKey: "PASTE_YOUR_API_KEY",
-      authDomain: "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "PASTE_YOUR_PROJECT_ID",
-      appId: "PASTE_YOUR_APP_ID"
-    };
-
-    const status = document.getElementById("status");
-    const account = document.getElementById("account");
-    const googleBtn = document.getElementById("googleBtn");
-
-    let auth;
-    let currentUser = null;
-
-    const configReady =
-      !Object.values(firebaseConfig).some(value =>
-        value.startsWith("PASTE_")
-      );
-
-    if (configReady) {
-      const app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-
-      onAuthStateChanged(auth, user => {
-        currentUser = user;
-        account.textContent = user
-          ? "Signed in as: " + user.email
-          : "Not signed in.";
-      });
-    } else {
-      account.textContent =
-        "Firebase setup needed: add your web app config first.";
-      googleBtn.disabled = true;
-      googleBtn.textContent = "Google Sign-In not configured";
+  <script>
+    function connect() {
+      const consent = document.getElementById("consent").checked;
+      if (!consent) {
+        document.getElementById("status").textContent =
+          "Please confirm consent first.";
+        return;
+      }
+      document.getElementById("status").textContent =
+        "Demo connected. No device data is being transmitted.";
     }
 
-    googleBtn.addEventListener("click", async () => {
-      if (!auth) return;
-      try {
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: "select_account" });
-        await signInWithPopup(auth, provider);
-        status.textContent =
-          "Google sign-in successful. Review the consent options.";
-      } catch (error) {
-        status.textContent = "Sign-in error: " + error.message;
-      }
-    });
-
-    document.getElementById("agreeBtn").addEventListener("click", () => {
-      if (!currentUser) {
-        status.textContent =
-          "Please sign in with Google first.";
-        return;
-      }
-
-      if (!document.getElementById("consent").checked) {
-        status.textContent =
-          "Please confirm your consent first.";
-        return;
-      }
-
-      status.textContent =
-        "Demo consent confirmed for " + currentUser.email +
-        ". No data has been sent or saved.";
-    });
-
-    document.getElementById("stopBtn").addEventListener("click", async () => {
+    function stopSharing() {
       ["device", "location", "screen", "chat", "consent"].forEach(id => {
         document.getElementById(id).checked = false;
       });
-
-      status.textContent =
-        "Demo consent withdrawn. No sharing is active.";
-
-      if (auth && currentUser) {
-        try {
-          await signOut(auth);
-        } catch (error) {
-          status.textContent += " Sign-out error: " + error.message;
-        }
-      }
-    });
+      document.getElementById("status").textContent =
+        "Sharing stopped in this demo.";
+    }
   </script>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7W0tCIAZoDNeni6whPWTSNcQHHiOeOXk",
+    authDomain: "jarvis-009.firebaseapp.com",
+    projectId: "jarvis-009",
+    storageBucket: "jarvis-009.firebasestorage.app",
+    messagingSenderId: "956607106451",
+    appId: "1:956607106451:web:26f13cd87ad9290271ac66"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
+const auth = getAuth(app);
+    onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("status").textContent =
+      "Logged in: " + user.email;
+  } else {
+    document.getElementById("status").textContent =
+      "Please log in.";
+  }
+});
+</script>
 </body>
 </html>
+  
